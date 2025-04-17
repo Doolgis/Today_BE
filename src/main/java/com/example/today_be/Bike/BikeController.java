@@ -29,7 +29,7 @@ public class BikeController {
     @Value("${DATA_KEY}")
     private String dataKey;
 
-    @GetMapping("/test")
+    @GetMapping("/now")
     public List<BikeResponseDto> test(@RequestParam double userX, @RequestParam double userY) throws IOException {
         StringBuilder urlBuilder = new StringBuilder("http://openapi.seoul.go.kr:8088/" + dataKey);
         urlBuilder.append("/" + URLEncoder.encode("json", "UTF-8"));
@@ -75,9 +75,9 @@ public class BikeController {
 //            System.out.println(bikeResponseDto);
 //        }
 
-        System.out.println("---- 반경 5km 내 따릉이 정보 반환");
+        System.out.println("---- 반경 1km 내 따릉이 정보 반환");
         return bikeResponseDtos.stream()
-                .filter(dto -> calculateDistance(userY, userX, dto.getSBIKE_Y(), dto.getSBIKE_X()) <= 5.0)
+                .filter(dto -> calculateDistance(userY, userX, dto.getSBIKE_Y(), dto.getSBIKE_X()) <= 1.0)
                 .collect(Collectors.toList());
     }
 
