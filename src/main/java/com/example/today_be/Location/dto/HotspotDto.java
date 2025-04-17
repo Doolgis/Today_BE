@@ -1,4 +1,4 @@
-package com.example.today_be.Location;
+package com.example.today_be.Location.dto;
 
 
 import lombok.AllArgsConstructor;
