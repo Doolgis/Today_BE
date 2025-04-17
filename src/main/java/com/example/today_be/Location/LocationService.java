@@ -1,4 +1,6 @@
 package com.example.today_be.Location;
+import com.example.today_be.Location.dto.HotspotDistanceDto;
+import com.example.today_be.Location.dto.HotspotDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,4 +28,11 @@ public class LocationService {
         List<HotspotDto> hotspotList = reader.loadHotspots();
         return DistanceService.findNearHotspots(userLat, userLon, hotspotList);
     }
+
+
+    public List<HotspotDistanceDto> getSortedHotspots(double userLat, double userLon) {
+        List<HotspotDto> allHotspots = reader.loadHotspots();
+        return DistanceService.sortNearHotspots(userLat, userLon, allHotspots);
+    }
+
 }

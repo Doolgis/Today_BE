@@ -1,8 +1,11 @@
 package com.example.today_be.Location;
 
+import com.example.today_be.Location.dto.HotspotDistanceDto;
+import com.example.today_be.Location.dto.HotspotDto;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -36,5 +39,22 @@ public class DistanceService {
             }
         }
         return nearHotspots;
+    }
+
+    // 사용자기준 가까운 거리순으로 정렬된 장소내기
+    public static List<HotspotDistanceDto> sortNearHotspots(double userLat, double userLon, List<HotspotDto> hotspotList) {
+        double radius = 5.0;
+
+        List<HotspotDistanceDto> nearDistanceHotspotList = new ArrayList<>();
+        for (HotspotDto h : hotspotList) {
+            double distance = calculateHaversine(userLat, userLon, h.getLatitude(), h.getLongtitude());
+            if (distance <= radius) {
+                nearDistanceHotspotList.add(new HotspotDistanceDto(distance, h));
+            }
+        }
+
+        // 거리 오름차순 정렬
+        nearDistanceHotspotList.sort(Comparator.comparingDouble(HotspotDistanceDto::getDistance));
+        return nearDistanceHotspotList;
     }
 }

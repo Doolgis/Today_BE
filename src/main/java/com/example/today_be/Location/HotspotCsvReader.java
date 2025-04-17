@@ -1,5 +1,6 @@
 package com.example.today_be.Location;
 
+import com.example.today_be.Location.dto.HotspotDto;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
