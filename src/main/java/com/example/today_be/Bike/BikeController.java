@@ -97,7 +97,7 @@ public class BikeController {
         return R * c;
     }
 
-    @GetMapping("/weather")
+    @GetMapping("/weather/5")
     public void resultBike() throws IOException {
         StringBuilder urlBuilder = new StringBuilder("http://openapi.seoul.go.kr:8088/" + dataKey);
         urlBuilder.append("/" + URLEncoder.encode("json", "UTF-8"));
@@ -164,7 +164,7 @@ public class BikeController {
     }
 
     @GetMapping("/recommand-course")
-    public List<RecommendedCourseDto> recommandCourse(@RequestParam double userX, @RequestParam double userY) throws IOException {
+    public List<RecommendedCourseDto> recommandCourse5(@RequestParam double userX, @RequestParam double userY) throws IOException {
         StringBuilder urlBuilder = new StringBuilder("http://openapi.seoul.go.kr:8088/" + dataKey);
         urlBuilder.append("/" + URLEncoder.encode("json", "UTF-8"));
         urlBuilder.append("/" + URLEncoder.encode("bikeList", "UTF-8"));
@@ -211,6 +211,68 @@ public class BikeController {
             System.out.println("distance : " + distance);
 
             if (distance >= 4.5 && distance <= 5.5 && parkingCount > 0) {
+                candidates.add(RecommendedCourseDto.builder()
+                        .startLat(userY)
+                        .startLon(userX)
+                        .endLat(lat)
+                        .endLon(lng)
+                        .endStationName(station.get("stationName").asText())
+                        .distanceKm(distance)
+                        .build());
+            }
+        }
+
+        return candidates;
+    }
+
+    @GetMapping("/recommand-course/10")
+    public List<RecommendedCourseDto> recommandCourse10(@RequestParam double userX, @RequestParam double userY) throws IOException {
+        StringBuilder urlBuilder = new StringBuilder("http://openapi.seoul.go.kr:8088/" + dataKey);
+        urlBuilder.append("/" + URLEncoder.encode("json", "UTF-8"));
+        urlBuilder.append("/" + URLEncoder.encode("bikeList", "UTF-8"));
+        urlBuilder.append("/" + URLEncoder.encode("1", "UTF-8"));
+        urlBuilder.append("/" + URLEncoder.encode("1000", "UTF-8"));
+
+        URL url = new URL(urlBuilder.toString());
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Content-type", "application/json");
+        System.out.println("Response Code : " + conn.getResponseCode());
+
+        BufferedReader br;
+
+        if (conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
+            br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        } else {
+            br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+        }
+
+        StringBuilder sb = new StringBuilder();
+        String line;
+
+        while ((line = br.readLine()) != null) {
+            sb.append(line);
+        }
+
+        br.close();
+        conn.disconnect();
+//        System.out.println(sb);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode root = objectMapper.readTree(sb.toString());
+        JsonNode bikeArray = root.path("rentBikeStatus").path("row");
+
+        List<RecommendedCourseDto> candidates = new ArrayList<>();
+
+        for (JsonNode station : bikeArray) {
+            double lat = station.path("stationLatitude").asDouble();  // 위도
+            double lng = station.path("stationLongitude").asDouble(); // 경도
+            int parkingCount = station.path("parkingBikeTotCnt").asInt(); // 주차 가능 따릉이 수
+
+            double distance = calculateDistance(userY, userX, lat, lng);
+            System.out.println("distance : " + distance);
+
+            if (distance >= 9.5 && distance <= 10.5 && parkingCount > 0) {
                 candidates.add(RecommendedCourseDto.builder()
                         .startLat(userY)
                         .startLon(userX)
